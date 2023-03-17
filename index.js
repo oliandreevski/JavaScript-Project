@@ -1,37 +1,51 @@
 const initApp = async () => {
   const cards = await fetchCards();
-  renderCards(cards, itemsPerPage);
+  renderCards(cards, currentPage);
   listenForLikes();
 };
 
-let itemsPerPage = 4;
+let dataLength;
+let currentPage = 1;
+let cardIncrease = 4;
+const pageCount = Math.ceil(dataLength / cardIncrease);
+
 document.addEventListener("DOMContentLoaded", initApp);
+
 const loadButton = document.querySelector(".button-main");
-console.log(itemsPerPage);
 
 // fetch
 const fetchCards = async () => {
   const response = await fetch("data.json");
   const data = await response.json();
-  if (data.length <= itemsPerPage) {
-    loadButton.style.display = "none";
-  }
+  dataLength = data.length;
   return data;
 };
-
 // load more items
-const loadItems = () => {
-  itemsPerPage += 4;
-  renderCards(cards, itemsPerPage);
+const loadItems = async () => {
+  const cards = await fetchCards();
+  renderCards(cards, currentPage + 1);
 };
 loadButton.addEventListener("click", loadItems);
 
+const handleButtonStatus = () => {
+  if (pageCount === currentPage) {
+    loadButton.classList.add("disabled");
+    loadButton.setAttribute("disabled", true);
+  }
+};
+
 // cards
-const renderCards = (cards, total = 4) => {
+const renderCards = (cards, pageIndex) => {
+  currentPage = pageIndex;
+  handleButtonStatus();
+  const startRange = (pageIndex - 1) * cardIncrease;
+  const endRange =
+    currentPage == pageCount ? cards.length : pageIndex * cardIncrease;
+
   const layout = document.getElementById("layout");
   const cardsArray = [];
 
-  for (let i = 0; i < total; i++) {
+  for (let i = startRange + 1; i <= endRange; i++) {
     // card elements
     const elementObject = createCardElements();
     // single card
@@ -39,7 +53,6 @@ const renderCards = (cards, total = 4) => {
     // push each card to arrat
     cardsArray.push(cardItem);
   }
-
   cardsArray.forEach((i) => {
     layout.appendChild(i);
   });
