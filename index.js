@@ -130,7 +130,7 @@ const createSingleCard = (elementObject, item) => {
   cardName.innerText = item.name;
   cardSpan.className = "card__date";
   cardSpan.innerText = item.date;
-  socialImage.src = "/icons/instagram.svg";
+  socialImage.src = `/icons/${item.source_type}.svg`;
   mainImageDiv.className = "card__image";
   mainImage.className = "card__image--cover";
   mainImage.src = item.image;
